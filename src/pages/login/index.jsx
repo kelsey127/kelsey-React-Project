@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Form, Icon, Input, Button,message } from 'antd';
+import { Form, Icon, Input, Button } from 'antd';
 import logo from './logo.png';
 import './index.less';
-const axios = require('axios');
+import { reqLogin } from '../../api';
 
 const Item = Form.Item;
 class Login extends Component {
@@ -10,27 +10,17 @@ class Login extends Component {
  //获取表单的值并发送请求
   login = (e) => {
     e.preventDefault();
-    this.props.form.validateFields((error,values)=>{
+    this.props.form.validateFields(async (error,values)=>{
       if(!error){
         //error代表表单验证结果
         const {username,password} = values;
-        console.log(values);
         //发送请求
-        axios.post("http://localhost:5000/login",{username,password})
-          .then((res)=>{
-            console.log(res)
-              if(res.status === 0) {
-                this.props.history.replace('/');
-              }else {
-                //可能用户发送的账号或者密码错误，导致请求失败，也会返回错误的信息，所以要提示
-                message.error(res.data.msg,2)
-                //登录失败后清空密码
-                this.props.form.resetFields([password])
-              }
-          })
-          .catch((err)=>{
-            message.error('网络状态异常，请刷新重试',2)
-          })
+        const result = await reqLogin(username,password)
+          if(result){
+            this.props.history.replace('/');
+          }else{
+            this.props.form.resetFields([password])
+          }
       }else {
         console.log('表单校验失败:',error);
       }
