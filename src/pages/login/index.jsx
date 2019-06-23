@@ -5,21 +5,21 @@ import './index.less';
 import { reqLogin } from '../../api';
 
 const Item = Form.Item;
-class Login extends Component {
+function Login(props) {
 
  //获取表单的值并发送请求
-  login = (e) => {
+  const login = (e) => {
     e.preventDefault();
-    this.props.form.validateFields(async (error,values)=>{
+    props.form.validateFields(async (error,values)=>{
       if(!error){
         //error代表表单验证结果
         const {username,password} = values;
         //发送请求
         const result = await reqLogin(username,password)
           if(result){
-            this.props.history.replace('/');
+            props.history.replace('/');
           }else{
-            this.props.form.resetFields([password])
+            props.form.resetFields([password])
           }
       }else {
         console.log('表单校验失败:',error);
@@ -29,7 +29,7 @@ class Login extends Component {
   }
 
   //自定义校验规则
-  validator = (rule,value,callback) => {
+  const validator = (rule,value,callback) => {
     const name = rule.fullField === 'username'?'用户名':'密码';
 
     if(!value){
@@ -46,10 +46,8 @@ class Login extends Component {
     }
   }
 
-
-  render() {
-    //获取from的方法
-    const {getFieldDecorator} = this.props.form;
+  //获取from的方法
+    const {getFieldDecorator} = props.form;
 
     return <div className="login">
       <header className="login-header">
@@ -58,7 +56,7 @@ class Login extends Component {
       </header>
       <section className="login-content">
         <h2>用户登录</h2>
-        <Form onSubmit={this.login} className="login-form">
+        <Form onSubmit={login} className="login-form">
 
           <Item>
             {
@@ -99,8 +97,5 @@ class Login extends Component {
         </Form>
       </section>
     </div>;
-  }
 }
-
-
 export default Form.create()(Login);
