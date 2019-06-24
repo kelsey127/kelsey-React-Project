@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React  from 'react';
 import { Form, Icon, Input, Button } from 'antd';
 import logo from '../../assets/images/logo.png';
 import './index.less';
