@@ -17,16 +17,15 @@ export default class Admin extends Component {
     this.setState({ collapsed });
   };
 
-
   //用户登录成功后，点击刷新页面，或者输入其他组件的地址导致页面刷新后保持登录状态而不用去重新登录
   async componentWillMount() {
     //user有值进入第一个判断，没有值则直接转到登录界面
     const user = getItem();
     //用户登录成功后发送请求判断_id是否真的存在
-    if(user && !user._id){
+    if(user && user._id){
       const result = await reqValidateUserInfo(user._id);
-      // 如果id 不存在说明是用户在localstorage伪造的用户名，如果直接return,返回登录界面
-      if(!result) return ;
+     //如果有结果，找到了，就直接return 不用执行下面转到登录界面的代码
+      if(result) return ;
     }
     this.props.history.replace("/login");
   }
