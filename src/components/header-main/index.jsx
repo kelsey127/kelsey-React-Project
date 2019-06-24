@@ -18,6 +18,7 @@ import menuList from '../../config/menu-config'
     weatherImg: "http://api.map.baidu.com/images/weather/day/qing.png"
   }
 
+  //点击退出
    logout = () => {
      Modal.confirm({
        title: '您确认要退出登录吗？',
@@ -35,6 +36,8 @@ import menuList from '../../config/menu-config'
    componentWillMount() {
     //登录成功后显示用户名的
      this.username =  getItem().username;
+     //标题切换
+     this.title = this.getTitle(this.props);
   }
 
   //页面渲染完成后获取天气
@@ -51,8 +54,14 @@ import menuList from '../../config/menu-config'
     },1000)
   }
 
-  getTitle = () => {
-    const {pathname} = this.props.location;
+  //在这个周期函数中，nextProps是最新的值，而不是this.props
+   //因为只有这个函数在组件切换更新的时候没有被触发，title的改变我们只需要做一次，因此放这里
+  componentWillReceiveProps(nextProps, nextContext) {
+    this.title = this.getTitle(nextProps)
+  }
+    //标题切换
+   getTitle = (nextProps) => {
+    const {pathname} = nextProps.location;
     for (let i = 0; i < menuList.length; i++) {
       const menu = menuList[i]
       if(menu.children) {
@@ -72,8 +81,6 @@ import menuList from '../../config/menu-config'
   };
 
    render() {
-     const title = this.getTitle();
-    console.log(title)
      const {sysTime,weather,weatherImg} = this.state;
     return <div>
       <div className="header-main-top">
@@ -81,7 +88,7 @@ import menuList from '../../config/menu-config'
         <MyButton onClick={this.logout}>退出</MyButton>
       </div>
       <div className="header-main-bottom">
-        <span className="header-main-left">{title}</span>
+        <span className="header-main-left">{this.title}</span>
         <div className="header-main-right">
           <span>{dayjs(sysTime).format('YYYY-MM-DD HH:mm:ss')}</span>
           <img src={weatherImg} alt=""/>

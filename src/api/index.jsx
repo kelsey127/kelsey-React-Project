@@ -25,3 +25,6 @@ export default function reqweather() {
     });
   })
 }
+
+//分类请求
+export const reqCategories = (parentId) =>ajax('/manage/category/list',{parentId});
