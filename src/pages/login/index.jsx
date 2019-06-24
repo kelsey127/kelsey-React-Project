@@ -3,6 +3,7 @@ import { Form, Icon, Input, Button } from 'antd';
 import logo from '../../assets/images/logo.png';
 import './index.less';
 import { reqLogin } from '../../api';
+import {setItem} from '../../utils/storage-tools'
 
 const Item = Form.Item;
 function Login(props) {
@@ -17,6 +18,7 @@ function Login(props) {
         //发送请求
         const result = await reqLogin(username,password)
           if(result){
+            setItem(result)
             props.history.replace('/');
           }else{
             props.form.resetFields([password])
@@ -64,7 +66,7 @@ function Login(props) {
                 'username',{
                   rules:[
                     {
-                      validator:this.validator
+                      validator:validator
                     }
                   ]
                 }
@@ -81,7 +83,7 @@ function Login(props) {
                 {
                   rules: [
                     {
-                      validator: this.validator
+                      validator:validator
                     }
                   ]
                 }
