@@ -18,12 +18,16 @@ export default class Admin extends Component {
   };
 
   //用户登录成功后，点击刷新页面，或者输入其他组件的地址导致页面刷新后保持登录状态而不用去重新登录
-  componentWillMount() {
+  async componentWillMount() {
+    //user有值进入第一个判断，没有值则直接转到登录界面
     const user = getItem();
-    //如果你没有这两个说明没有登录成功，所以需要重新去登录界面，如果有说明登录成功，所以不需要处理
-    if(!user || !user._id){
-      this.props.history.replace("/login");
+    //用户登录成功后发送请求判断_id是否真的存在
+    if(user && !user._id){
+      const result = await reqValidateUserInfo(user._id);
+      // 如果id 不存在说明是用户在localstorage伪造的用户名，如果直接return,返回登录界面
+      if(!result) return ;
     }
+    this.props.history.replace("/login");
   }
 
   render() {
