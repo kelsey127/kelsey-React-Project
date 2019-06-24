@@ -26,8 +26,6 @@ export default class Admin extends Component {
     }
   }
 
-
-
   render() {
     const {collapsed} = this.state;
     return (
