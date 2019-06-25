@@ -10,8 +10,9 @@ export const reqValidateUserInfo = (id) =>ajax('/validate/user',{id},'POST');
 //发送天气请求
 
 export default function reqweather() {
-  return new Promise((resolve, reject) => {
-    jsonp('http://api.map.baidu.com/telematics/v3/weather?location=深圳&output=json&ak=3p49MVra6urFRGOT9s8UBWr2',{},(err,data)=>{
+  let cancel  = null;
+  const promise = new Promise((resolve, reject) => {
+   cancel = jsonp('http://api.map.baidu.com/telematics/v3/weather?location=深圳&output=json&ak=3p49MVra6urFRGOT9s8UBWr2',{},(err,data)=>{
       if(!err){
         const{dayPictureUrl,weather} = data.results[0].weather_data[0];
         resolve({
@@ -23,8 +24,15 @@ export default function reqweather() {
         resolve()
       }
     });
-  })
+  });
+  return {
+    promise,
+    cancel
+  }
 }
 
 //分类请求
 export const reqCategories = (parentId) =>ajax('/manage/category/list',{parentId});
+
+//添加分类
+export const reqAddCategory = (parentId,categoryName) =>ajax('/manage/category/add',{parentId,categoryName},'POST');

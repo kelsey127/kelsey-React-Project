@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import { Table,Card,Icon} from 'antd';
+import { Button,Table,Card,Icon,Modal} from 'antd';
 import MyButton from '../../components/my-button'
 import './index.less';
-import {reqCategories} from '../../api'
+import {reqCategories,reqAddCategory} from '../../api';
+import AddCategoryForm from './add-category-form';
 
 export default class Category extends Component {
 
   state ={
-      categories:[]
+      categories:[],
+      isShowAddCategory: false
   }
-
+  //请求数据动态展示品类内容
   async componentDidMount() {
     const result = await reqCategories("0")
     if(result) {
@@ -19,7 +21,22 @@ export default class Category extends Component {
     }
   }
 
+  //添加品类
+  showAddCategory = () => {
+    this.setState({
+      isShowAddCategory: true
+    })
+  };
+
+  //隐藏添加品类
+  hideAddCategory = () => {
+    this.setState({
+      isShowAddCategory: false
+    })
+  }
+
   render() {
+    const {categories, isShowAddCategory} = this.state;
     const columns = [
       {
         title: '品类名称',
@@ -40,7 +57,7 @@ export default class Category extends Component {
     // const data = this.state.categories;
 
    return <div>
-       <Card type="inner" title="一级分类列表" extra={<a href="#"><Icon type="plus" />添加品类</a>}>
+       <Card type="inner" title="一级分类列表" extra={<Button type='primary' onClick={this.showAddCategory}><Icon type="plus" />添加品类</Button>}>
          <Table
            columns={columns}
            dataSource={this.state.categories}
@@ -52,6 +69,17 @@ export default class Category extends Component {
              showQuickJumper:true
            }}
          />
+         <Modal
+           title="添加分类"
+           visible={isShowAddCategory}
+           onOk={this.addCategory}
+           onCancel={this.hideAddCategory}
+           okText="确认"
+           cancelText="取消"
+         >
+          <AddCategoryForm categories={categories} wrappedComponentRef={(form)=>this.addCategoryForm=form}/>
+         </Modal>
+
        </Card>
    </div>
   }

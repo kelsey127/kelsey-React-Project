@@ -19,6 +19,8 @@ export default class Admin extends Component {
   //控制左边收缩的，flase不收缩
   state = {
     collapsed: false,
+    isLoading:true,
+    success:false
   };
 
   onCollapse = collapsed => {
@@ -34,14 +36,28 @@ export default class Admin extends Component {
     if(user && user._id){
       const result = await reqValidateUserInfo(user._id);
      //如果有结果，找到了，就直接return 不用执行下面转到登录界面的代码
-      if(result) return ;
+      if(result){
+        return this.setState({
+          isLoading:false,
+          success:true
+        })
+      }
     }
-    this.props.history.replace("/login");
+
+    this.setState({
+      isLoading:false,
+      success:false
+    })
   }
 
   render() {
-    const {collapsed} = this.state;
-    return (
+    const {isLoading,success,collapsed} = this.state;
+
+    if(isLoading) return null;
+
+
+
+    return success? (
       <Layout style={{ minHeight: '100vh' }}>
         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
           <LeftNav collapsed={collapsed}/>
@@ -70,6 +86,6 @@ export default class Admin extends Component {
           </Footer>
         </Layout>
       </Layout>
-    );
+    ) :<Redirect to='/login'/>;
   }
 }

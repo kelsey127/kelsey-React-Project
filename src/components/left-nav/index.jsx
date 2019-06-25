@@ -26,7 +26,7 @@ class LeftNav extends Component {
     //动态创建菜单
   componentWillMount() {
     const {pathname} = this.props.location;
-
+    let isHome = true ;
     this.menus = menuList.map((menu)=>{
       const children = menu.children;
       //判断是否是二级菜单
@@ -44,17 +44,19 @@ class LeftNav extends Component {
             children.map((item)=> {
               if(item.key === pathname){
                 this.selectedKey = menu.key;
+                isHome = false;
               }
              return this.createMenu(item);
             })
           }
         </SubMenu>
       }else {
+          if(menu.key === pathname) isHome = false;
         return this.createMenu(menu)
       }
     })
 
-    this.SelectedKey = pathname;
+    this.SelectedKey = isHome? '/home':pathname ;
 
   }
 

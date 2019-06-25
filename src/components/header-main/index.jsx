@@ -42,19 +42,27 @@ import menuList from '../../config/menu-config'
 
   //页面渲染完成后获取天气
  async componentDidMount() {
-    const result = await reqweather();
+    const {promise,cancel} = reqweather();
+    this.cancel = cancel;
+    const result = await promise;
+
     if(result){
       this.setState(result)
     }
 
-    setInterval(()=>{
+   this.timeID = setInterval(()=>{
       this.setState({
         sysTime:Date.now()
       })
     },1000)
   }
 
-  //在这个周期函数中，nextProps是最新的值，而不是this.props
+  componentWillUnmount() {
+     clearInterval(this.timeID);
+     this.cancel();
+  }
+
+   //在这个周期函数中，nextProps是最新的值，而不是this.props
    //因为只有这个函数在组件切换更新的时候没有被触发，title的改变我们只需要做一次，因此放这里
   componentWillReceiveProps(nextProps, nextContext) {
     this.title = this.getTitle(nextProps)
