@@ -18,7 +18,7 @@ export default function ajax(url,data={},method='get') {
       //返回来的是一个对象
       const { data } = res;
       if(data.status === 0) {
-        return data.data;
+        return data.data || {};
       }else {
         message.error(data.msg,2)
       }
@@ -27,3 +27,5 @@ export default function ajax(url,data={},method='get') {
       message.error('网络状态异常，请刷新重试',2)
     })
 }
+
+
