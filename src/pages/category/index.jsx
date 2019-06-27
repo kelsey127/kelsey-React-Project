@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import { Button,Table,Card,Icon,Modal,message} from 'antd';
 import MyButton from '../../components/my-button'
@@ -9,25 +10,48 @@ import UpdateCategoryNameForm from './update-category-name';
 export default class Category extends Component {
 
   state ={
-      categories:[],
-      isShowAddCategory: false,
-      isShowUpdateCategoryName:false
+    categories:[],//一级菜单
+    subCategories:[],//二级菜单
+    isShowSubcategories:false,
+    isShowAddCategory: false,
+    isShowUpdateCategoryName:false,
+    loading:true
   }
 
   //初始化category，让它为一个对象
   category = {};
 
   //请求数据动态展示品类内容
-  async componentDidMount() {
-    const result = await reqCategories("0")
-    if(result) {
-      this.setState({
-        categories:result
-      })
-    }
+   componentDidMount() {
+    this.fetchCategories('0')
   }
 
-  //添加品类
+  //封装请求分类数据
+  fetchCategories = async (parentId) =>{
+    this.setState({
+      loading:true
+    })
+
+    const result = await reqCategories(parentId)
+    if(result) {
+      if(parentId ==="0"){
+        this.setState({
+          categories:result
+        })
+      }else {
+        this.setState({
+          subCategories:result,
+          isShowSubcategories:true
+        });
+      }
+    }
+
+    this.setState({
+      loading:false
+    });
+  }
+
+  //添加分类
   addCategory = () => {
     const { form } = this.addCategoryForm.props;
 
@@ -49,8 +73,13 @@ export default class Category extends Component {
             isShowAddCategory: false
           };
 
+          const{ isShowSubcategories } = this.state;
+
           if (result.parentId === '0') {
             options.categories = [...this.state.categories, result];
+          }else if(isShowSubcategories && result.parentId === this.parentCategory._id){
+            //进入这个判断后肯定是二级分类的数据，二级分类的数据和一级分类的_id相等，如果相等才能展示
+            options.subCategories = [...this.state.subCategories, result];
           }
           // 统一更新
           this.setState(options);
@@ -93,7 +122,7 @@ export default class Category extends Component {
   updateCategoryName = () => {
     const { form } = this.updateCategoryNameForm.props;
     // 校验表单，收集数据
-    form.validateFields(async (err, values) => {
+    form.validateFields(async   (err, values) => {
       if (!err) {
         const { categoryName } = values;
         const categoryId = this.category._id;
@@ -101,8 +130,17 @@ export default class Category extends Component {
         const result = await reqUpdateCategoryName(categoryId, categoryName);
 
         if (result) {
+          const { parentId } = this.category;
+          let categoryData = this.state.categories;
+          let setName = 'categories';
+          if(parentId !== '0') {
+            //二级分类
+            categoryData = this.state.subCategories;
+            setName = 'subCategories'
+          }
+
           // 保留原数据，生成新数组
-          const categories = this.state.categories.map((category) => {
+          const categories = categoryData .map((category) => {
             let { _id, name, parentId } = category;
             // 找到对应id的category，修改分类名称
             if (_id === categoryId) {
@@ -124,16 +162,31 @@ export default class Category extends Component {
 
           this.setState({
             isShowUpdateCategoryName: false,
-            categories
+            [setName]:categories
           })
         }
       }
     })
   };
 
+  //点击查看子品类
+   showSubCategory = (category) =>{
+    return async ()=> {
+      this.parentCategory = category;   //不要放错位置，这个点击后返回的函数里面的，这样才能拿到那个值
+      this.fetchCategories(category._id);
+    }
+  }
+
+  //点击二级分类中的一级分类返回
+  goBack = () => {
+     this.setState({
+       isShowSubcategories:false
+     })
+  }
+
 
   render() {
-    const {categories, isShowAddCategory,isShowUpdateCategoryName} = this.state;
+    const {categories, subCategories,isShowAddCategory,isShowUpdateCategoryName,isShowSubcategories,loading} = this.state;
     const columns = [
       {
         title: '品类名称',
@@ -144,52 +197,56 @@ export default class Category extends Component {
         // dataIndex: 'operation',
         className:'category_operation',
         render: category => {
-          console.log(category);
           return <div>
-          <MyButton onClick={this.saveCategory(category)}>修改名称</MyButton>
-          <MyButton onClick ={this.showSubCategory}>查看其子品类</MyButton>
-        </div>}
+            <MyButton onClick={this.saveCategory(category)}>修改名称</MyButton>
+            {
+              isShowSubcategories?null: <MyButton onClick ={this.showSubCategory(category)}>查看其子品类</MyButton>
+            }
+          </div>}
       },
     ];
 
     // const data = this.state.categories;
 
-   return <div>
-       <Card type="inner" title="一级分类列表" extra={<Button type='primary' onClick={this.toggleDisplay('isShowAddCategory', true)}><Icon type="plus" />添加品类</Button>}>
-         <Table
-           columns={columns}
-           dataSource={this.state.categories}
-           bordered
-           pagination={{
-             showSizeChanger:true,
-             pageSizeOptions:['3','6','9','12'],
-             defaultPageSize:3,
-             showQuickJumper:true
-           }}
-         />
-         <Modal
-           title="添加分类"
-           visible={isShowAddCategory}
-           onOk={this.addCategory}
-           onCancel={this.toggleDisplay('isShowAddCategory', false)}
-           okText="确认"
-           cancelText="取消"
-         >
+    return <div>
+      <Card type="inner" title={isShowSubcategories?<div><MyButton onClick={this.goBack}>一级分类列表</MyButton><Icon type='arrow-right'/>&nbsp;&nbsp;<span>{ this.parentCategory.name}</span></div>:'一级分类列表'}
+            extra={<Button type='primary' onClick={this.toggleDisplay('isShowAddCategory', true)}><Icon type="plus" />添加品类</Button>}>
+        <Table
+          columns={columns}
+          dataSource={isShowSubcategories?subCategories:categories}
+          bordered
+          pagination={{
+            showSizeChanger:true,
+            pageSizeOptions:['3','6','9','12'],
+            defaultPageSize:3,
+            showQuickJumper:true
+          }}
+          rowKey='_id'
+          loading={loading}
+        />
+        <Modal
+          title="添加分类"
+          visible={isShowAddCategory}
+          onOk={this.addCategory}
+          onCancel={this.toggleDisplay('isShowAddCategory', false)}
+          okText="确认"
+          cancelText="取消"
+        >
           <AddCategoryForm categories={categories} wrappedComponentRef={(form)=>this.addCategoryForm=form}/>
-         </Modal>
+        </Modal>
 
-         <Modal
-           title="修改分类名称"
-           visible={isShowUpdateCategoryName}
-           onOk={this.updateCategoryName}
-           onCancel={this.hideUpdateCategoryName}
-           okText="确认"
-           cancelText="取消"
-           width={250}
-         >
-           <UpdateCategoryNameForm categoryName={this.category.name} wrappedComponentRef={(form) => this.updateCategoryNameForm = form}/>
-         </Modal>
-       </Card>
-   </div>
+        <Modal
+          title="修改分类名称"
+          visible={isShowUpdateCategoryName}
+          onOk={this.updateCategoryName}
+          onCancel={this.hideUpdateCategoryName}
+          okText="确认"
+          cancelText="取消"
+          width={250}
+        >
+          <UpdateCategoryNameForm categoryName={this.category.name} wrappedComponentRef={(form) => this.updateCategoryNameForm = form}/>
+        </Modal>
+      </Card>
+    </div>
   }
 }

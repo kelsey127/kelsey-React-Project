@@ -4,23 +4,23 @@ import PropTypes from 'prop-types';
 const { Item, } = Form;
 const { Option } = Select;
 
- class AddCategoryForm extends Component {
-   static propTypes = {
-     categories: PropTypes.array.isRequired
-   };
+class AddCategoryForm extends Component {
+  static propTypes = {
+    categories: PropTypes.array.isRequired
+  };
 
-   //分类名称输入自定义验证规则
-   validator = (rule, value, callback) => {
-     if (!value) return callback('请输入分类名称~');
-     const result = this.props.categories.find((category) => category.name === value);
-     if (result) {
-       callback('输入的分类名称已存在，请重新输入');
-     } else {
-       callback();
-     }
-   };
+  //分类名称输入自定义验证规则
+  validator = (rule, value, callback) => {
+    if (!value) return callback('请输入分类名称~');
+    const result = this.props.categories.find((category) => category.name === value);
+    if (result) {
+      callback('输入的分类名称已存在，请重新输入');
+    } else {
+      callback();
+    }
+  };
 
-   render() {
+  render() {
     const { getFieldDecorator } = this.props.form;
     return<Form>
       <Item label="所属分类">

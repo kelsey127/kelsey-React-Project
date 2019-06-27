@@ -39,3 +39,5 @@ export const reqAddCategory = (parentId,categoryName) =>ajax('/manage/category/a
 
 //更改名称
 export const reqUpdateCategoryName = (categoryId, categoryName) => ajax('/manage/category/update', {categoryId, categoryName}, 'POST');
+
+export const reqProducts = (pageNum,pageSize) =>ajax('/manage/product/list',{pageNum,pageSize});

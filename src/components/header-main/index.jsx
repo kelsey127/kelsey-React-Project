@@ -69,8 +69,15 @@ import menuList from '../../config/menu-config'
   }
     //标题切换
    getTitle = (nextProps) => {
-    const {pathname} = nextProps.location;
-    for (let i = 0; i < menuList.length; i++) {
+    let {pathname} = nextProps.location;
+
+    // 处理商品页标题不自动显示的问题
+     const pathnameReg = /^\/product\//;
+     if(pathnameReg.test(pathname)){
+       pathname = pathname.slice(0,8)
+     }
+
+     for (let i = 0; i < menuList.length; i++) {
       const menu = menuList[i]
       if(menu.children) {
         for (let j = 0; j < menu.children.length; j++) {

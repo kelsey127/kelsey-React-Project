@@ -25,7 +25,14 @@ class LeftNav extends Component {
 
     //动态创建菜单
   componentWillMount() {
-    const {pathname} = this.props.location;
+    let {pathname} = this.props.location;
+
+    //处理商品那里不会自动展开和选中
+    const pathnameReg = /^\/product\//;
+    if(pathnameReg.test(pathname)){
+      pathname = pathname.slice(0,8)
+    }
+
     let isHome = true ;
     this.menus = menuList.map((menu)=>{
       const children = menu.children;
