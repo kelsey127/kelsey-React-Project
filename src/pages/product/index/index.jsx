@@ -64,34 +64,30 @@ export default class Index extends Component {
    ]
 
     return   <Card
-      title={
-        <div>
-          <Select defaultValue={0}>
-            <Option key={0} value={0}>根据商品名称</Option>
-            <Option key={1} value={1}>根据商品描述</Option>
-          </Select>
-          <Input placeholder='关键字' className="search-input"/>
-          <Button type='primary'>搜索</Button>
-        </div>
-      }
-      extra={<Button type="primary" onClick={this.showAddProduct}><Icon type="plus"/>添加产品</Button>}
-     >
-      <Table
-        columns={columns}
-        dataSource={products}
-        bordered
-        pagination={{
-          showQuickJumper: true,
-          showSizeChanger: true,
-          pageSizeOptions: ['3', '6', '9', '12'],
-          defaultPageSize: 3
-        }}
-      >
-      </Table>
-
-
+        title={
+          <div>
+            <Select defaultValue={0}>
+              <Option key={0} value={0}>根据商品名称</Option>
+              <Option key={1} value={1}>根据商品描述</Option>
+            </Select>
+            <Input placeholder='关键字' className="search-input"/>
+            <Button type='primary'>搜索</Button>
+          </div>
+        }
+        extra={<Button type="primary" onClick={this.showAddProduct}><Icon type="plus"/>添加产品</Button>}
+       >
+        <Table
+          columns={columns}
+          dataSource={products}
+          bordered
+          pagination={{
+            showQuickJumper: true,
+            showSizeChanger: true,
+            pageSizeOptions: ['3', '6', '9', '12'],
+            defaultPageSize: 3
+          }}
+        >
+        </Table>
       </Card>
-
-
  }
 }

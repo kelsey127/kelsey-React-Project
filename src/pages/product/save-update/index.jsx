@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card, Icon, Form, Input, Button, Cascader, InputNumber  } from 'antd';
 
 import { reqCategories } from '../../../api';
-// import RichTextEditor from './rich-text-editor';
+import RichTextEditor from './rich-text-editor';
 
 import './index.less';
 
@@ -36,11 +36,13 @@ export default class SaveUpdate extends Component {
    * @param selectedOptions
    */
   loadData = async selectedOptions => {
+    console.log(selectedOptions)
     // 获取数组最后一项
     const targetOption = selectedOptions[selectedOptions.length - 1];
+    console.log(targetOption)
     // 显示loading图标
     targetOption.loading = true;
-    // 发送请求、请求二级分类数据
+    // 发送请求、请求二级  分类数据
     const result = await reqCategories(targetOption.value);
 
     if (result) {
@@ -104,7 +106,7 @@ export default class SaveUpdate extends Component {
           />
         </Item>
         <Item label="商品详情" wrapperCol={{span: 20}}>
-          {/*<RichTextEditor />*/}
+          <RichTextEditor />
         </Item>
         <Item>
           <Button type="primary" className="add-product-btn" htmlType="submit">提交</Button>
