@@ -9,17 +9,32 @@ const {Option} = Select;
 export default class Index extends Component {
 
   state = {
-    products: []
+    products: [],
+    total:0,
+    loading:true
   };
 
   async componentDidMount() {
-    const result = await reqProducts(1, 3);
+    this.getProducts(1,3)
+  };
+
+  //封装页面展示请求
+  getProducts = async (pageNum,pageSize) =>{
+    this.setState({
+      loading:true
+    });
+    const result = await reqProducts(pageNum, pageSize);
     if (result) {
       this.setState({
-        products: result.list
+        products: result.list,
+        total:result.total
       })
     }
-  };
+    this.setState({
+      loading:false
+    });
+  }
+
 
   showAddProduct = () => {
     this.props.history.push('/product/saveupdate');
@@ -27,7 +42,9 @@ export default class Index extends Component {
 
 
  render() {
-  const{ products } = this.state;
+
+  const{ products ,total,loading} = this.state;
+
    const columns =[
      {
        title:'商品名称',
@@ -84,8 +101,13 @@ export default class Index extends Component {
             showQuickJumper: true,
             showSizeChanger: true,
             pageSizeOptions: ['3', '6', '9', '12'],
-            defaultPageSize: 3
+            defaultPageSize: 3,
+            total,
+            onChange:this.getProducts,//后台分页请求
+            onShowSizeChange:this.getProducts,// 一页要显示多少数据
+            loading
           }}
+          rowKey='_id'
         >
         </Table>
       </Card>

@@ -140,7 +140,7 @@ export default class Category extends Component {
           }
 
           // 保留原数据，生成新数组
-          const categories = categoryData .map((category) => {
+          const categories = categoryData.map((category) => {
             let { _id, name, parentId } = category;
             // 找到对应id的category，修改分类名称
             if (_id === categoryId) {
